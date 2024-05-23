@@ -1,0 +1,89 @@
+//
+//  MissionView.swift
+//  Moonshot
+//
+//  Created by Om Preetham Bandi on 5/23/24.
+//
+
+import SwiftUI
+
+struct RectangleDivider: View {
+    var body: some View {
+        Rectangle()
+            .frame(height: 2)
+            .foregroundStyle(.lightBackground)
+            .padding(.vertical)
+    }
+}
+
+struct MissionView: View {
+    struct CrewMember {
+        let role: String
+        let astronaut: Astronaut
+    }
+    
+    let mission: Mission
+    let crew: [CrewMember]
+
+    var body: some View {
+        ScrollView {
+            VStack {
+                Image(mission.image)
+                    .resizable()
+                    .scaledToFit()
+                    .containerRelativeFrame(.horizontal) { width, axis in
+                        width * 0.5
+                    }
+                    .padding(.top)
+                
+                Text(mission.formattedLaunchDate)
+                    .padding()
+                    .font(.headline)
+                    .fontWeight(.bold)
+
+                VStack(alignment: .leading) {
+                    
+                    RectangleDivider()
+                    
+                    Text("Mission Highlights")
+                        .font(.title.bold())
+                        .padding(.bottom, 5)
+
+                    Text(mission.description)
+                    
+                    RectangleDivider()
+                    
+                    Text("Crew")
+                        .font(.title.bold())
+                        .padding(.bottom, 5)
+                }
+                .padding(.horizontal)
+                CrewView(crew: crew)
+            }
+            .padding(.bottom)
+        }
+        .navigationTitle(mission.displayName)
+        .navigationBarTitleDisplayMode(.inline)
+        .background(.darkBackground)
+    }
+    
+    init(mission: Mission, astronauts: [String: Astronaut]) {
+        self.mission = mission
+        
+        self.crew = mission.crew.map { member in
+            if let astronaut = astronauts[member.name] {
+                return CrewMember(role: member.role, astronaut: astronaut)
+            } else {
+                fatalError("Missing \(member.name)")
+            }
+        }
+    }
+}
+
+#Preview {
+    let missions: [Mission] = Bundle.main.decode("missions.json")
+    let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
+    
+    return MissionView(mission: missions[1], astronauts: astronauts)
+        .preferredColorScheme(.dark)
+}
