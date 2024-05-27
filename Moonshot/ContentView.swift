@@ -10,13 +10,11 @@ import SwiftUI
 struct ListView: View {
     let astronauts: [String: Astronaut]
     let missions: [Mission]
-    
+        
     var body: some View {
         LazyVStack {
             ForEach(missions) { mission in
-                NavigationLink {
-                    MissionView(mission: mission, astronauts: astronauts)
-                } label: {
+                NavigationLink(value: mission) {
                     HStack {
                         Image(mission.image)
                             .resizable()
@@ -42,6 +40,9 @@ struct ListView: View {
                             .stroke(.lightBackground)
                     }
                 }
+                .navigationDestination(for: Mission.self) { selection in
+                    MissionView(mission: mission, astronauts: astronauts)
+                }
 
             }
         }
@@ -60,9 +61,7 @@ struct GridView: View {
     var body: some View {
         LazyVGrid(columns: columns, content: {
             ForEach(missions) { mission in
-                NavigationLink {
-                    MissionView(mission: mission, astronauts: astronauts)
-                } label: {
+                NavigationLink(value: mission) {
                     VStack {
                         Image(mission.image)
                             .resizable()
@@ -87,7 +86,9 @@ struct GridView: View {
                             .stroke(.lightBackground)
                     }
                 }
-
+                .navigationDestination(for: Mission.self) { selection in
+                    MissionView(mission: mission, astronauts: astronauts)
+                }
             }
         })
         .padding([.horizontal, .bottom])
